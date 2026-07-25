@@ -1,0 +1,6 @@
+node_modules
+dist
+.vite
+*.local
+1.mp4
+A1.mp4
