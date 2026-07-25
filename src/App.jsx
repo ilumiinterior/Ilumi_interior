@@ -73,18 +73,23 @@ function App() {
     if (!video) return undefined;
 
     const unlockVideo = () => {
-      if (video.readyState < 2) return;
+      if (video.readyState < 1) {
+        video.load();
+        return;
+      }
+
       const currentTime = video.currentTime;
       video
         .play()
         .then(() => {
           video.pause();
           video.currentTime = currentTime;
+          window.removeEventListener("touchstart", unlockVideo);
         })
         .catch(() => {});
     };
 
-    window.addEventListener("touchstart", unlockVideo, { once: true, passive: true });
+    window.addEventListener("touchstart", unlockVideo, { passive: true });
     return () => window.removeEventListener("touchstart", unlockVideo);
   }, []);
 
@@ -173,9 +178,17 @@ function App() {
     };
   }, [videoState, isReducedMotion]);
 
-  const handleReady = () => {
+  const handleMetadata = () => {
     const video = videoRef.current;
-    if (!video || hasInitializedVideoRef.current) return;
+    if (
+      !video ||
+      hasInitializedVideoRef.current ||
+      !Number.isFinite(video.duration) ||
+      video.duration <= 0
+    ) {
+      return;
+    }
+
     hasInitializedVideoRef.current = true;
     video.pause();
     video.currentTime = 0;
@@ -195,7 +208,8 @@ function App() {
             muted
             playsInline
             disablePictureInPicture
-            onCanPlay={handleReady}
+            onLoadedMetadata={handleMetadata}
+            onLoadedData={handleMetadata}
             onError={() => setVideoState("error")}
             aria-label="Vizualizácia návrhu kuchyne ILUMI INTERIOR"
           />
