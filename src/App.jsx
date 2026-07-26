@@ -6,24 +6,148 @@ import "lenis/dist/lenis.css";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const VIDEO_SOURCES = {
-  mobile: "/media/ilumi-mobile.mp4",
-  desktop: "/media/ilumi-1440.mp4",
-};
+const VIDEO_STORIES = [
+  {
+    id: "zaciatok",
+    index: "01",
+    sources: {
+      mobile: "/media/ilumi-mobile.mp4",
+      desktop: "/media/ilumi-1440.mp4",
+    },
+    poster: "/media/poster.jpg",
+    title: "Váš interiér...",
+    outro: "navrhnutý do posledného detailu",
+    ariaLabel: "Animovaná prezentácia návrhu kuchyne ILUMI INTERIOR",
+    showHeader: true,
+    priority: true,
+  },
+  {
+    id: "obyvacia-izba",
+    index: "02",
+    sources: {
+      mobile: "/media/ilumi-v2-mobile.mp4",
+      desktop: "/media/ilumi-v2-1440.mp4",
+    },
+    poster: "/media/poster-v2.jpg",
+    title: "Priestor, ktorý žije s vami.",
+    outro: "premyslený v každom pohľade",
+    ariaLabel: "Animovaná prezentácia obývacieho priestoru ILUMI INTERIOR",
+    priority: false,
+  },
+];
 
-function selectVideoSource() {
-  if (typeof window === "undefined") return VIDEO_SOURCES.desktop;
+const SERVICES = [
+  {
+    title: "Interiérový dizajn",
+    description:
+      "Premyslený návrh priestoru, dispozície, materiálov, svetla a nábytku. Nie dekoratívna náhoda oblečená do béžovej.",
+    icon: "compass",
+  },
+  {
+    title: "Fotorealistické vizualizácie",
+    description:
+      "Silné statické výstupy pre klientov, prezentácie, predaj a rozhodovanie ešte pred realizáciou.",
+    icon: "camera",
+  },
+  {
+    title: "Interaktívne prehliadky",
+    description:
+      "Priestor, ktorý sa dá prejsť cez mobil, tablet alebo PC. Ideálne pre developerov, showroomy a realitný predaj.",
+    icon: "cursor",
+  },
+];
 
-  const connection = navigator.connection;
-  const saveData = Boolean(connection?.saveData);
+const PRICING = [
+  {
+    tier: "Štandard",
+    title: "Návrh interiéru s vizualizáciami",
+    price: "40 € / m²",
+    note: "s DPH · pri ploche do 120 m²",
+    features: [
+      "digitalizácia dodaných podkladov",
+      "úvodné osobné alebo online stretnutie",
+      "2D pôdorysné riešenie návrhu",
+      "materiálový koncept a výber prvkov",
+      "fotorealistické vizualizácie interiéru",
+      "zoznam použitých prvkov a materiálov",
+      "jedno kolo korekcií k vizualizáciám",
+    ],
+  },
+  {
+    tier: "Premium",
+    title: "Návrh interiéru s dokumentáciou",
+    price: "60 € / m²",
+    note: "s DPH · pri ploche do 100 m²",
+    featured: true,
+    badge: "Najžiadanejšie",
+    features: [
+      "všetko zo služby Štandard",
+      "detailná projektová dokumentácia návrhu",
+      "výkresy stavebných úprav, podláh, dverí a svetiel",
+      "podklady pre profesistov: voda, elektro, SDK, kladačské plány",
+      "výkresy nábytku na mieru: pôdorysy, pohľady, rezy a detaily",
+      "podklady pre klientské zmeny u developera",
+    ],
+  },
+  {
+    tier: "Turbo",
+    title: "Rýchly návrh v zrýchlenom režime",
+    price: "na dopyt",
+    note: "pre projekty, ktoré horia viac než rozpočet po prvej návšteve showroomu",
+    features: [
+      "zrýchlený harmonogram podľa kapacity",
+      "prioritizácia najdôležitejších miestností",
+      "rozsah a cena podľa konkrétneho zadania",
+      "vhodné pri termínoch developera alebo rýchlej rekonštrukcii",
+    ],
+  },
+];
+
+function selectVideoSource(sources) {
+  if (typeof window === "undefined") return sources.desktop;
+
+  const saveData = Boolean(navigator.connection?.saveData);
   const compact = window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
-
-  if (saveData || compact) return VIDEO_SOURCES.mobile;
-  return VIDEO_SOURCES.desktop;
+  return saveData || compact ? sources.mobile : sources.desktop;
 }
 
-function App() {
-  const rootRef = useRef(null);
+function ServiceIcon({ name }) {
+  if (name === "camera") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 7.5h3l1.5-2h7l1.5 2h3v11H4z" />
+        <circle cx="12" cy="13" r="3.2" />
+      </svg>
+    );
+  }
+
+  if (name === "cursor") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m5 4 13.8 6.1-6.2 1.8-2.5 5.8z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="8" />
+      <path d="m14.7 8.3-1.8 4.6-4.6 1.8 1.8-4.6z" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <span className="check-icon" aria-hidden="true">
+      <svg viewBox="0 0 16 16">
+        <path d="m4 8.2 2.4 2.4L12.2 5" />
+      </svg>
+    </span>
+  );
+}
+
+function ScrollStory({ story, isReducedMotion }) {
   const storyRef = useRef(null);
   const videoRef = useRef(null);
   const progressRef = useRef(null);
@@ -32,41 +156,26 @@ function App() {
   const outroRef = useRef(null);
   const hasInitializedVideoRef = useRef(false);
   const [videoState, setVideoState] = useState("loading");
-  const [isReducedMotion, setIsReducedMotion] = useState(false);
-  const videoSource = useMemo(selectVideoSource, []);
+  const [shouldPreload, setShouldPreload] = useState(story.priority);
+  const videoSource = useMemo(() => selectVideoSource(story.sources), [story.sources]);
+  const StoryTitle = story.index === "01" ? "h1" : "h2";
 
   useEffect(() => {
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const updatePreference = () => setIsReducedMotion(reducedMotion.matches);
+    if (story.priority || !storyRef.current) return undefined;
 
-    updatePreference();
-    reducedMotion.addEventListener("change", updatePreference);
-    return () => reducedMotion.removeEventListener("change", updatePreference);
-  }, []);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldPreload(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "100% 0px" },
+    );
 
-  useLayoutEffect(() => {
-    if (isReducedMotion || !window.matchMedia("(pointer: fine)").matches) {
-      return undefined;
-    }
-
-    const lenis = new Lenis({
-      duration: 0.9,
-      smoothWheel: true,
-      syncTouch: false,
-      wheelMultiplier: 0.85,
-    });
-    const updateScroll = (time) => lenis.raf(time * 1000);
-
-    lenis.on("scroll", ScrollTrigger.update);
-    gsap.ticker.add(updateScroll);
-    gsap.ticker.lagSmoothing(0);
-
-    return () => {
-      gsap.ticker.remove(updateScroll);
-      gsap.ticker.lagSmoothing(500, 33);
-      lenis.destroy();
-    };
-  }, [isReducedMotion]);
+    observer.observe(storyRef.current);
+    return () => observer.disconnect();
+  }, [story.priority]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -169,7 +278,7 @@ function App() {
         video.removeEventListener("seeked", handleSeeked);
         window.cancelAnimationFrame(seekFrame);
       };
-    }, rootRef);
+    }, storyRef);
 
     ScrollTrigger.refresh();
     return () => {
@@ -196,26 +305,31 @@ function App() {
   };
 
   return (
-    <main ref={rootRef} className={isReducedMotion ? "reduced-motion" : ""}>
-      <section ref={storyRef} className="story" aria-label="Animovaná prezentácia interiéru">
-        <div className="scene">
-          <video
-            ref={videoRef}
-            className="scene__video"
-            src={videoSource}
-            poster="/media/poster.jpg"
-            preload="auto"
-            muted
-            playsInline
-            disablePictureInPicture
-            onLoadedMetadata={handleMetadata}
-            onLoadedData={handleMetadata}
-            onError={() => setVideoState("error")}
-            aria-label="Vizualizácia návrhu kuchyne ILUMI INTERIOR"
-          />
+    <section
+      id={story.id}
+      ref={storyRef}
+      className="story"
+      aria-label={story.ariaLabel}
+    >
+      <div className="scene">
+        <video
+          ref={videoRef}
+          className="scene__video"
+          src={videoSource}
+          poster={story.poster}
+          preload={shouldPreload ? "auto" : "metadata"}
+          muted
+          playsInline
+          disablePictureInPicture
+          onLoadedMetadata={handleMetadata}
+          onLoadedData={handleMetadata}
+          onError={() => setVideoState("error")}
+          aria-label={story.ariaLabel}
+        />
 
-          <div className="scene__shade" aria-hidden="true" />
+        <div className="scene__shade" aria-hidden="true" />
 
+        {story.showHeader && (
           <header className="topbar">
             <a className="brand" href="#zaciatok" aria-label="ILUMI INTERIOR — začiatok">
               <img src="/brand/ilumi-logo-white.png" alt="" />
@@ -225,50 +339,181 @@ function App() {
               <span>Slovensko</span>
             </div>
           </header>
+        )}
 
-          <div id="zaciatok" ref={introRef} className="intro">
-            <p className="eyebrow">ILUMI INTERIOR / 01</p>
-            <h1>Váš interiér...</h1>
-            <div className="scroll-cue" aria-hidden="true">
-              <span>Posúvajte</span>
-              <svg viewBox="0 0 16 22" role="img">
-                <path d="M8 1v18m0 0 6-6m-6 6-6-6" />
-              </svg>
-            </div>
+        <div ref={introRef} className="intro">
+          <p className="eyebrow">ILUMI INTERIOR / {story.index}</p>
+          <StoryTitle className="story-title">{story.title}</StoryTitle>
+          <div className="scroll-cue" aria-hidden="true">
+            <span>Posúvajte</span>
+            <svg viewBox="0 0 16 22">
+              <path d="M8 1v18m0 0 6-6m-6 6-6-6" />
+            </svg>
           </div>
-
-          <div ref={outroRef} className="outro">
-            <p className="outro__title">navrhnutý do posledného detailu</p>
-          </div>
-
-          <div ref={progressRef} className="progress" aria-hidden="true">
-            <span ref={progressTextRef}>00</span>
-            <div className="progress__track">
-              <i />
-            </div>
-            <span>100</span>
-          </div>
-
-          {videoState === "loading" && (
-            <div className="status" role="status">
-              <span className="status__line" />
-              <span>Pripravujem vizualizáciu</span>
-            </div>
-          )}
-
-          {videoState === "error" && (
-            <div className="status status--error" role="alert">
-              <strong>Video sa nepodarilo načítať.</strong>
-              <span>Skontrolujte pripojenie a obnovte stránku.</span>
-            </div>
-          )}
         </div>
-      </section>
 
-      <section className="afterword" aria-label="Koniec ukážky">
-        <p>ILUMI INTERIOR</p>
-        <span>Pokračovanie stránky doplníme v ďalšom kroku.</span>
-      </section>
+        <div ref={outroRef} className="outro">
+          <p className="outro__title">{story.outro}</p>
+        </div>
+
+        <div ref={progressRef} className="progress" aria-hidden="true">
+          <span ref={progressTextRef}>00</span>
+          <div className="progress__track">
+            <i />
+          </div>
+          <span>100</span>
+        </div>
+
+        {videoState === "loading" && (
+          <div className="status" role="status">
+            <span className="status__line" />
+            <span>Pripravujem vizualizáciu</span>
+          </div>
+        )}
+
+        {videoState === "error" && (
+          <div className="status status--error" role="alert">
+            <strong>Video sa nepodarilo načítať.</strong>
+            <span>Skontrolujte pripojenie a obnovte stránku.</span>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function ServicesSection() {
+  return (
+    <section className="content-section services" aria-labelledby="services-title">
+      <div className="section-shell">
+        <header className="section-heading">
+          <p className="section-kicker">Služby</p>
+          <h2 id="services-title">Od návrhu po interaktívny zážitok.</h2>
+        </header>
+
+        <div className="service-grid">
+          {SERVICES.map((service, index) => (
+            <article className="service-card" key={service.title}>
+              <div className="service-card__top">
+                <span className="service-icon">
+                  <ServiceIcon name={service.icon} />
+                </span>
+                <span className="service-number">0{index + 1}</span>
+              </div>
+              <div className="service-card__copy">
+                <h3>{service.title}</h3>
+                <p>{service.description}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PricingSection() {
+  return (
+    <section className="content-section pricing" aria-labelledby="pricing-title">
+      <div className="section-shell">
+        <header className="pricing-heading">
+          <div>
+            <p className="section-kicker">Služby a cenník</p>
+            <h2 id="pricing-title">
+              Jasný rozsah.
+              <br />
+              Jasná cena.
+              <br />
+              Menej hádania.
+            </h2>
+          </div>
+          <p className="pricing-intro">
+            Základ je jednoduchý: najprv sa nastaví rozsah, potom návrh, potom korekcie
+            a výstup. Varianty riešime iba vtedy, keď majú dôvod. Nie preto, že
+            rozhodovanie je novodobá forma sebapoškodzovania.
+          </p>
+        </header>
+
+        <div className="pricing-grid">
+          {PRICING.map((plan) => (
+            <article
+              className={`price-card${plan.featured ? " price-card--featured" : ""}`}
+              key={plan.tier}
+            >
+              <div className="price-card__heading">
+                <div className="price-card__meta">
+                  <p>{plan.tier}</p>
+                  {plan.badge && <span>{plan.badge}</span>}
+                </div>
+                <h3>{plan.title}</h3>
+                <p className="price-card__price">{plan.price}</p>
+                <p className="price-card__note">{plan.note}</p>
+              </div>
+
+              <ul>
+                {plan.features.map((feature) => (
+                  <li key={feature}>
+                    <CheckIcon />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function App() {
+  const rootRef = useRef(null);
+  const [isReducedMotion, setIsReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setIsReducedMotion(reducedMotion.matches);
+
+    updatePreference();
+    reducedMotion.addEventListener("change", updatePreference);
+    return () => reducedMotion.removeEventListener("change", updatePreference);
+  }, []);
+
+  useLayoutEffect(() => {
+    if (isReducedMotion || !window.matchMedia("(pointer: fine)").matches) {
+      return undefined;
+    }
+
+    const lenis = new Lenis({
+      duration: 0.9,
+      smoothWheel: true,
+      syncTouch: false,
+      wheelMultiplier: 0.85,
+    });
+    const updateScroll = (time) => lenis.raf(time * 1000);
+
+    lenis.on("scroll", ScrollTrigger.update);
+    gsap.ticker.add(updateScroll);
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      gsap.ticker.remove(updateScroll);
+      gsap.ticker.lagSmoothing(500, 33);
+      lenis.destroy();
+    };
+  }, [isReducedMotion]);
+
+  return (
+    <main ref={rootRef} className={isReducedMotion ? "reduced-motion" : ""}>
+      <ScrollStory story={VIDEO_STORIES[0]} isReducedMotion={isReducedMotion} />
+      <ServicesSection />
+      <ScrollStory story={VIDEO_STORIES[1]} isReducedMotion={isReducedMotion} />
+      <PricingSection />
+
+      <footer className="site-footer">
+        <img src="/brand/ilumi-logo-white.png" alt="ILUMI INTERIOR" />
+        <p>Interiérový dizajn · vizualizácie · interaktívne prehliadky</p>
+      </footer>
     </main>
   );
 }

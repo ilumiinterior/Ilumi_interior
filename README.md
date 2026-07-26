@@ -1,6 +1,6 @@
 # ILUMI INTERIOR — scroll video prototype
 
-Prvý funkčný prototyp landing page, v ktorom scroll ovláda čas HTML5 videa cez GSAP ScrollTrigger.
+Landing page ILUMI INTERIOR s dvoma scrollom ovládanými HTML5 videami, prehľadom služieb a responzívnym cenníkom. Čas videí ovláda GSAP ScrollTrigger a wheel/trackpad scroll vyhladzuje Lenis.
 
 ## Lokálne spustenie
 
