@@ -121,6 +121,7 @@ const PROJECT_TYPES = [
 ];
 
 const INSTAGRAM_URL = "https://www.instagram.com/ilumi.interior/";
+const VIRTUAL_TOUR_URL = "https://prehliadka1.vercel.app/";
 
 const INSTAGRAM_POSTS = [
   {
@@ -668,6 +669,99 @@ function ServicesSection() {
   );
 }
 
+function VirtualTourSection() {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const [isEngaged, setIsEngaged] = useState(false);
+
+  const startTour = () => {
+    setIsLoaded(true);
+    setIsEngaged(true);
+  };
+
+  return (
+    <section className="tour-section" aria-labelledby="tour-title">
+      <div className="tour-shell">
+        <header className="tour-heading">
+          <div>
+            <p className="section-kicker">Interaktívna prehliadka / 04</p>
+            <h2 id="tour-title">Vstúpte do priestoru.</h2>
+          </div>
+          <p>
+            Rozhliadnite sa vlastným tempom. Prehliadku môžete ovládať myšou,
+            dotykom aj na celej obrazovke.
+          </p>
+        </header>
+
+        <div className={`tour-stage${isEngaged ? " tour-stage--engaged" : ""}`}>
+          <div className="tour-stage__bar">
+            <span>ILUMI / 360°</span>
+            <div className="tour-stage__controls">
+              {isLoaded && isEngaged && (
+                <button type="button" onClick={() => setIsEngaged(false)}>
+                  Ukončiť ovládanie
+                </button>
+              )}
+              <a
+                href={VIRTUAL_TOUR_URL}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Otvoriť 360-stupňovú prehliadku v novom okne"
+              >
+                Celá obrazovka
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="M4 16 16 4m0 0H7m9 0v9" />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div className="tour-stage__viewport">
+            {isLoaded && (
+              <iframe
+                className={isReady ? "is-ready" : ""}
+                src={VIRTUAL_TOUR_URL}
+                title="360° interaktívna prehliadka ILUMI INTERIOR"
+                allow="fullscreen; accelerometer; gyroscope"
+                allowFullScreen
+                referrerPolicy="strict-origin-when-cross-origin"
+                tabIndex={isEngaged ? 0 : -1}
+                onLoad={() => setIsReady(true)}
+              />
+            )}
+
+            {isLoaded && !isReady && (
+              <div className="tour-stage__loading" role="status">
+                <span className="status__line" />
+                <span>Načítavam 360° prehliadku</span>
+              </div>
+            )}
+
+            {!isEngaged && (
+              <button
+                className="tour-gate"
+                type="button"
+                onClick={startTour}
+                aria-label={isLoaded ? "Pokračovať v 360-stupňovej prehliadke" : undefined}
+              >
+                <span className="tour-gate__mark" aria-hidden="true">
+                  360°
+                </span>
+                <strong>{isLoaded ? "Pokračovať v prehliadke" : "Spustiť prehliadku"}</strong>
+                <small>
+                  {isLoaded
+                    ? "Po skončení ovládania môžete pokračovať v posúvaní stránky."
+                    : "Načíta sa až po kliknutí, aby zostala stránka rýchla."}
+                </small>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function PricingSection() {
   return (
     <section className="content-section pricing" aria-labelledby="pricing-title">
@@ -1050,8 +1144,9 @@ function App() {
       <ServicesSection />
       <ScrollStory story={VIDEO_STORIES[1]} isReducedMotion={isReducedMotion} />
       <DrawingsStory isReducedMotion={isReducedMotion} />
-      <PricingSection />
+      <VirtualTourSection />
       <InstagramSection />
+      <PricingSection />
       <ContactSection />
 
       <footer className="site-footer">
