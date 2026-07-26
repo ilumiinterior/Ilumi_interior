@@ -122,22 +122,26 @@ const PROJECT_TYPES = [
 
 const INSTAGRAM_URL = "https://www.instagram.com/ilumi.interior/";
 
-const INSTAGRAM_PREVIEWS = [
+const INSTAGRAM_POSTS = [
   {
-    src: "/media/instagram-01.jpg",
-    alt: "Detail vstavaného nábytku v návrhu interiéru",
+    url: "https://www.instagram.com/p/DbAdeqVBapM/",
+    src: "/media/instagram-post-01.jpg",
+    alt: "Interaktívna prezentácia návrhu obývacieho priestoru",
   },
   {
-    src: "/media/instagram-02.jpg",
-    alt: "Kuchynský ostrov a tmavá drevená zostava",
+    url: "https://www.instagram.com/p/DYeVN0rAW8y/",
+    src: "/media/instagram-post-02.jpg",
+    alt: "Pohľad z galérie do svetlého obývacieho priestoru",
   },
   {
-    src: "/media/instagram-03.jpg",
-    alt: "Obývací priestor s krbom a nábytkom na mieru",
+    url: "https://www.instagram.com/p/DYaRo_tkvWU/",
+    src: "/media/instagram-post-03.jpg",
+    alt: "Vizualizácia obývacej izby so zelenou sedačkou",
   },
   {
-    src: "/media/instagram-04.jpg",
-    alt: "Technické výkresy nábytku na mieru",
+    url: "https://www.instagram.com/p/DYRftnSDy6N/",
+    src: "/media/instagram-post-04.jpg",
+    alt: "Interaktívny výber materiálu sedačky v návrhu interiéru",
   },
 ];
 
@@ -733,41 +737,45 @@ function InstagramSection() {
     <section className="instagram-section" aria-labelledby="instagram-title">
       <div className="instagram-shell">
         <header className="instagram-heading">
-          <div className="instagram-heading__label">
+          <div>
             <p className="section-kicker">Zo štúdia / Instagram</p>
-            <span aria-hidden="true">04</span>
+            <h2 id="instagram-title">Aktuálne na Instagrame.</h2>
           </div>
-          <div className="instagram-heading__copy">
-            <h2 id="instagram-title">Sledujte, ako priestor vzniká.</h2>
-            <p>
-              Nové projekty, pracovné detaily aj rozhodnutia, ktoré za hotovým
-              interiérom nie je vidieť. Ak vám tento spôsob premýšľania sedí,
-              napíšte mi priamo na Instagrame.
-            </p>
-          </div>
+          <a
+            className="instagram-profile-link"
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <InstagramIcon />
+            <span>@ilumi.interior</span>
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+              <path d="M4 16 16 4m0 0H7m9 0v9" />
+            </svg>
+          </a>
         </header>
 
-        <div className="instagram-board" aria-label="Výber z tvorby ILUMI INTERIOR">
-          {INSTAGRAM_PREVIEWS.map((preview, index) => (
+        <div className="instagram-post-grid" aria-label="Posledné príspevky ILUMI INTERIOR">
+          {INSTAGRAM_POSTS.map((post, index) => (
             <a
-              className="instagram-frame"
-              href={INSTAGRAM_URL}
+              className="instagram-post"
+              href={post.url}
               target="_blank"
               rel="noreferrer"
-              key={preview.src}
-              aria-label={`Otvoriť Instagram ILUMI INTERIOR — ukážka ${index + 1}`}
+              key={post.url}
+              aria-label={`Otvoriť príspevok ${index + 1} na Instagrame`}
             >
               <img
-                src={preview.src}
-                alt={preview.alt}
+                src={post.src}
+                alt={post.alt}
                 loading="lazy"
                 decoding="async"
               />
-              <span className="instagram-frame__number" aria-hidden="true">
+              <span className="instagram-post__number" aria-hidden="true">
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <span className="instagram-frame__action" aria-hidden="true">
-                Otvoriť profil
+              <span className="instagram-post__action" aria-hidden="true">
+                Pozrieť príspevok
                 <svg viewBox="0 0 20 20">
                   <path d="M4 16 16 4m0 0H7m9 0v9" />
                 </svg>
@@ -775,22 +783,6 @@ function InstagramSection() {
             </a>
           ))}
         </div>
-
-        <a
-          className="instagram-handle"
-          href={INSTAGRAM_URL}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Otvoriť profil @ilumi.interior na Instagrame"
-        >
-          <span className="instagram-handle__icon">
-            <InstagramIcon />
-          </span>
-          <span>@ilumi.interior</span>
-          <svg className="instagram-handle__arrow" viewBox="0 0 28 28" aria-hidden="true">
-            <path d="M5 23 23 5m0 0H9m14 0v14" />
-          </svg>
-        </a>
       </div>
     </section>
   );
