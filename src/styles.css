@@ -718,6 +718,220 @@ a {
   stroke-width: 1.8;
 }
 
+.instagram-section {
+  position: relative;
+  overflow: clip;
+  background: oklch(11% 0.008 82);
+  border-top: 1px solid oklch(26% 0.01 82);
+  border-bottom: 1px solid oklch(26% 0.01 82);
+  color: var(--paper);
+}
+
+.instagram-shell {
+  width: min(100%, 92rem);
+  margin-inline: auto;
+  padding:
+    clamp(5rem, 11vw, 10rem)
+    max(var(--page-gutter), env(safe-area-inset-right))
+    clamp(4.5rem, 9vw, 8rem)
+    max(var(--page-gutter), env(safe-area-inset-left));
+}
+
+.instagram-heading {
+  display: grid;
+  gap: clamp(3rem, 7vw, 6rem);
+  margin-bottom: clamp(3.5rem, 8vw, 7rem);
+}
+
+.instagram-heading__label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+.instagram-heading__label > span {
+  color: oklch(48% 0.014 82);
+  font-family: "Geologica", sans-serif;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.15em;
+}
+
+.instagram-heading__copy {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.instagram-heading h2 {
+  max-width: 11ch;
+  margin: 0 0 0 -0.04em;
+  font-family: "Geologica", sans-serif;
+  font-size: clamp(2.9rem, 9vw, 7.4rem);
+  font-variation-settings: "wdth" 77;
+  font-weight: 650;
+  letter-spacing: -0.065em;
+  line-height: 0.91;
+  text-wrap: balance;
+}
+
+.instagram-heading__copy > p {
+  max-width: 49ch;
+  margin: 0;
+  color: oklch(74% 0.017 82);
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+  line-height: 1.62;
+}
+
+.instagram-board {
+  display: flex;
+  width: calc(100% + var(--page-gutter) * 2);
+  margin-inline: calc(var(--page-gutter) * -1);
+  gap: var(--space-md);
+  padding-inline:
+    max(var(--page-gutter), env(safe-area-inset-left))
+    max(var(--page-gutter), env(safe-area-inset-right));
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-padding-inline: var(--page-gutter);
+  scroll-snap-type: inline mandatory;
+  scrollbar-width: none;
+}
+
+.instagram-board::-webkit-scrollbar {
+  display: none;
+}
+
+.instagram-frame {
+  position: relative;
+  display: block;
+  flex: 0 0 min(78vw, 20rem);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--dark-raised);
+  color: var(--paper);
+  scroll-snap-align: start;
+  text-decoration: none;
+}
+
+.instagram-frame::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, oklch(8% 0.007 82 / 0.74), transparent 42%),
+    linear-gradient(to bottom, oklch(8% 0.007 82 / 0.34), transparent 24%);
+  content: "";
+  pointer-events: none;
+}
+
+.instagram-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 420ms var(--ease-out-quint);
+}
+
+.instagram-frame__number,
+.instagram-frame__action {
+  position: absolute;
+  z-index: 1;
+  font-family: "Geologica", sans-serif;
+  font-variation-settings: "wdth" 86;
+  font-variant-numeric: tabular-nums;
+}
+
+.instagram-frame__number {
+  top: var(--space-md);
+  left: var(--space-md);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+}
+
+.instagram-frame__action {
+  right: var(--space-md);
+  bottom: var(--space-md);
+  left: var(--space-md);
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  transition:
+    opacity 220ms var(--ease-out-quint),
+    transform 220ms var(--ease-out-quint);
+}
+
+.instagram-frame__action svg {
+  width: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  stroke-width: 1.25;
+}
+
+.instagram-frame:focus-visible,
+.instagram-handle:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 0.35rem;
+}
+
+.instagram-handle {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  margin-top: clamp(4rem, 9vw, 8rem);
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+  border-top: 1px solid oklch(34% 0.011 82);
+  border-bottom: 1px solid oklch(34% 0.011 82);
+  color: var(--paper);
+  text-decoration: none;
+}
+
+.instagram-handle > span:nth-child(2) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-family: "Geologica", sans-serif;
+  font-size: clamp(2rem, 8.2vw, 7.6rem);
+  font-variation-settings: "wdth" 76;
+  font-weight: 390;
+  letter-spacing: -0.06em;
+  line-height: 0.9;
+}
+
+.instagram-handle__icon {
+  display: grid;
+  width: clamp(2rem, 4vw, 3.5rem);
+  place-items: center;
+}
+
+.instagram-handle__icon svg,
+.instagram-handle__arrow {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.35;
+}
+
+.instagram-handle__icon svg {
+  width: 100%;
+}
+
+.instagram-icon__dot {
+  fill: currentColor;
+  stroke: none;
+}
+
+.instagram-handle__arrow {
+  width: clamp(1.5rem, 3vw, 2.75rem);
+  transition: transform 220ms var(--ease-out-quint);
+}
+
 .contact-section {
   position: relative;
   color-scheme: light;
@@ -1234,6 +1448,55 @@ a {
     align-items: end;
   }
 
+  .instagram-heading {
+    grid-template-columns: minmax(12rem, 0.55fr) minmax(30rem, 1.45fr);
+    align-items: start;
+  }
+
+  .instagram-heading__copy {
+    justify-items: start;
+  }
+
+  .instagram-heading__copy > p {
+    margin-inline-start: clamp(3rem, 10vw, 10rem);
+  }
+
+  .instagram-board {
+    display: grid;
+    width: 100%;
+    margin-inline: 0;
+    grid-template-columns: 1.05fr 0.82fr 1.12fr 0.78fr;
+    align-items: start;
+    gap: clamp(0.75rem, 1.5vw, 1.5rem);
+    padding: 0 0 clamp(5rem, 9vw, 9rem);
+    overflow: visible;
+  }
+
+  .instagram-frame {
+    width: 100%;
+    transform: translateY(var(--frame-offset, 0));
+  }
+
+  .instagram-frame:nth-child(1) {
+    --frame-offset: clamp(2rem, 5vw, 5rem);
+  }
+
+  .instagram-frame:nth-child(2) {
+    --frame-offset: 0;
+  }
+
+  .instagram-frame:nth-child(3) {
+    --frame-offset: clamp(4rem, 8vw, 8rem);
+  }
+
+  .instagram-frame:nth-child(4) {
+    --frame-offset: clamp(1.5rem, 3vw, 3rem);
+  }
+
+  .instagram-handle {
+    margin-top: 0;
+  }
+
   .contact-shell {
     grid-template-columns: minmax(18rem, 0.78fr) minmax(24rem, 1.22fr);
     align-items: start;
@@ -1330,6 +1593,24 @@ a {
 
   .contact-submit:not(:disabled):hover svg {
     transform: translateX(0.2rem);
+  }
+
+  .instagram-frame__action {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+
+  .instagram-frame:hover img {
+    transform: scale(1.035);
+  }
+
+  .instagram-frame:hover .instagram-frame__action {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .instagram-handle:hover .instagram-handle__arrow {
+    transform: translate(0.25rem, -0.25rem);
   }
 }
 

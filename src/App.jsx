@@ -120,6 +120,27 @@ const PROJECT_TYPES = [
   "Iný projekt",
 ];
 
+const INSTAGRAM_URL = "https://www.instagram.com/ilumi.interior/";
+
+const INSTAGRAM_PREVIEWS = [
+  {
+    src: "/media/instagram-01.jpg",
+    alt: "Detail vstavaného nábytku v návrhu interiéru",
+  },
+  {
+    src: "/media/instagram-02.jpg",
+    alt: "Kuchynský ostrov a tmavá drevená zostava",
+  },
+  {
+    src: "/media/instagram-03.jpg",
+    alt: "Obývací priestor s krbom a nábytkom na mieru",
+  },
+  {
+    src: "/media/instagram-04.jpg",
+    alt: "Technické výkresy nábytku na mieru",
+  },
+];
+
 function selectVideoSource(sources) {
   if (typeof window === "undefined") return sources.desktop;
 
@@ -697,6 +718,84 @@ function PricingSection() {
   );
 }
 
+function InstagramIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4.25" />
+      <circle cx="17.4" cy="6.7" r="0.8" className="instagram-icon__dot" />
+    </svg>
+  );
+}
+
+function InstagramSection() {
+  return (
+    <section className="instagram-section" aria-labelledby="instagram-title">
+      <div className="instagram-shell">
+        <header className="instagram-heading">
+          <div className="instagram-heading__label">
+            <p className="section-kicker">Zo štúdia / Instagram</p>
+            <span aria-hidden="true">04</span>
+          </div>
+          <div className="instagram-heading__copy">
+            <h2 id="instagram-title">Sledujte, ako priestor vzniká.</h2>
+            <p>
+              Nové projekty, pracovné detaily aj rozhodnutia, ktoré za hotovým
+              interiérom nie je vidieť. Ak vám tento spôsob premýšľania sedí,
+              napíšte mi priamo na Instagrame.
+            </p>
+          </div>
+        </header>
+
+        <div className="instagram-board" aria-label="Výber z tvorby ILUMI INTERIOR">
+          {INSTAGRAM_PREVIEWS.map((preview, index) => (
+            <a
+              className="instagram-frame"
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noreferrer"
+              key={preview.src}
+              aria-label={`Otvoriť Instagram ILUMI INTERIOR — ukážka ${index + 1}`}
+            >
+              <img
+                src={preview.src}
+                alt={preview.alt}
+                loading="lazy"
+                decoding="async"
+              />
+              <span className="instagram-frame__number" aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span className="instagram-frame__action" aria-hidden="true">
+                Otvoriť profil
+                <svg viewBox="0 0 20 20">
+                  <path d="M4 16 16 4m0 0H7m9 0v9" />
+                </svg>
+              </span>
+            </a>
+          ))}
+        </div>
+
+        <a
+          className="instagram-handle"
+          href={INSTAGRAM_URL}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Otvoriť profil @ilumi.interior na Instagrame"
+        >
+          <span className="instagram-handle__icon">
+            <InstagramIcon />
+          </span>
+          <span>@ilumi.interior</span>
+          <svg className="instagram-handle__arrow" viewBox="0 0 28 28" aria-hidden="true">
+            <path d="M5 23 23 5m0 0H9m14 0v14" />
+          </svg>
+        </a>
+      </div>
+    </section>
+  );
+}
+
 function ContactSection() {
   const [formState, setFormState] = useState("idle");
   const [formMessage, setFormMessage] = useState("");
@@ -761,7 +860,7 @@ function ContactSection() {
     <section id="kontakt" className="contact-section" aria-labelledby="contact-title">
       <div className="contact-shell">
         <header className="contact-heading">
-          <p className="section-kicker">Kontakt / 04</p>
+          <p className="section-kicker">Kontakt / 05</p>
           <h2 id="contact-title">Poďme navrhnúť váš priestor.</h2>
           <p>
             Stačí základ. Typ priestoru, približná plocha a pár viet o tom, čo
@@ -960,6 +1059,7 @@ function App() {
       <ScrollStory story={VIDEO_STORIES[1]} isReducedMotion={isReducedMotion} />
       <DrawingsStory isReducedMotion={isReducedMotion} />
       <PricingSection />
+      <InstagramSection />
       <ContactSection />
 
       <footer className="site-footer">
