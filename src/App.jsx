@@ -112,6 +112,14 @@ const PRICING = [
   },
 ];
 
+const PROJECT_TYPES = [
+  "Byt",
+  "Rodinný dom",
+  "Komerčný priestor",
+  "Developerský projekt",
+  "Iný projekt",
+];
+
 function selectVideoSource(sources) {
   if (typeof window === "undefined") return sources.desktop;
 
@@ -689,6 +697,225 @@ function PricingSection() {
   );
 }
 
+function ContactSection() {
+  const [formState, setFormState] = useState("idle");
+  const [formMessage, setFormMessage] = useState("");
+  const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+
+    if (!form.reportValidity() || formState === "sending") return;
+
+    if (!accessKey) {
+      setFormState("error");
+      setFormMessage("Formulár ešte nie je pripojený k cieľovému e-mailu.");
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 12000);
+    const formData = new FormData(form);
+
+    formData.append("access_key", accessKey);
+    formData.append("subject", "Nový dopyt z webu ILUMI INTERIOR");
+    formData.append("from_name", "ILUMI INTERIOR");
+
+    setFormState("sending");
+    setFormMessage("Odosielam váš projekt…");
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData,
+        signal: controller.signal,
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(response.status === 429 ? "rate-limit" : "submission-failed");
+      }
+
+      form.reset();
+      setFormState("success");
+      setFormMessage("Ďakujeme. Váš projekt bol odoslaný. Ozveme sa s ďalším postupom.");
+    } catch (error) {
+      const isRateLimit = error.message === "rate-limit";
+      const isOffline = !navigator.onLine || error.name === "AbortError";
+
+      setFormState("error");
+      setFormMessage(
+        isRateLimit
+          ? "Formulár prijal priveľa požiadaviek. Skúste to, prosím, o chvíľu."
+          : isOffline
+            ? "Odoslanie sa nepodarilo. Skontrolujte pripojenie a skúste to znova."
+            : "Správu sa nepodarilo odoslať. Vaše údaje zostali vo formulári — skúste to znova.",
+      );
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  };
+
+  return (
+    <section id="kontakt" className="contact-section" aria-labelledby="contact-title">
+      <div className="contact-shell">
+        <header className="contact-heading">
+          <p className="section-kicker">Kontakt / 04</p>
+          <h2 id="contact-title">Poďme navrhnúť váš priestor.</h2>
+          <p>
+            Stačí základ. Typ priestoru, približná plocha a pár viet o tom, čo
+            potrebujete vyriešiť.
+          </p>
+        </header>
+
+        <div className="contact-form-wrap">
+          <form className="contact-form" onSubmit={handleSubmit}>
+            <input
+              className="contact-form__botcheck"
+              type="checkbox"
+              name="botcheck"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+            />
+
+            <div className="contact-form__grid">
+              <label className="form-field">
+                <span>Meno <small>nepovinné</small></span>
+                <input
+                  type="text"
+                  name="name"
+                  autoComplete="name"
+                  maxLength="80"
+                  placeholder="Vaše meno"
+                />
+              </label>
+
+              <label className="form-field">
+                <span>E-mail</span>
+                <input
+                  type="email"
+                  name="email"
+                  autoComplete="email"
+                  inputMode="email"
+                  maxLength="160"
+                  placeholder="vas@email.sk"
+                  required
+                />
+              </label>
+
+              <label className="form-field">
+                <span>Telefón <small>nepovinné</small></span>
+                <input
+                  type="tel"
+                  name="phone"
+                  autoComplete="tel"
+                  inputMode="tel"
+                  maxLength="40"
+                  placeholder="+421"
+                />
+              </label>
+
+              <label className="form-field">
+                <span>Typ projektu</span>
+                <select name="project_type" defaultValue="" required>
+                  <option value="" disabled>
+                    Vyberte typ priestoru
+                  </option>
+                  {PROJECT_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="form-field form-field--area">
+                <span>Približná plocha <small>nepovinné</small></span>
+                <span className="form-field__unit">
+                  <input
+                    type="number"
+                    name="area"
+                    inputMode="decimal"
+                    min="1"
+                    max="10000"
+                    step="1"
+                    placeholder="85"
+                  />
+                  <i aria-hidden="true">m²</i>
+                </span>
+              </label>
+
+              <label className="form-field form-field--message">
+                <span>Čo potrebujete vyriešiť?</span>
+                <textarea
+                  name="message"
+                  minLength="10"
+                  maxLength="2000"
+                  rows="5"
+                  placeholder="Napíšte nám stručne o priestore, stave projektu a vašej predstave."
+                  required
+                />
+              </label>
+            </div>
+
+            <div className="contact-form__footer">
+              <p className="contact-form__privacy">
+                Odoslaním formulára beriete na vedomie, že údaje použijeme iba
+                na vybavenie vášho dopytu.{" "}
+                <a href="#ochrana-osobnych-udajov">Ako chránime vaše údaje</a>
+              </p>
+
+              <button
+                className="contact-submit"
+                type="submit"
+                disabled={formState === "sending"}
+              >
+                <span>
+                  {formState === "sending" ? "Odosielam projekt" : "Odoslať projekt"}
+                </span>
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="M3 10h13m0 0-5-5m5 5-5 5" />
+                </svg>
+              </button>
+            </div>
+
+            <p
+              className={`contact-form__status contact-form__status--${formState}`}
+              role={formState === "error" ? "alert" : "status"}
+              aria-live="polite"
+            >
+              {formMessage}
+            </p>
+          </form>
+
+          <details id="ochrana-osobnych-udajov" className="privacy-details">
+            <summary>Ochrana osobných údajov</summary>
+            <div>
+              <p>
+                ILUMI INTERIOR použije údaje z formulára iba na vybavenie vášho
+                dopytu a prípravu ponuky. Právnym základom sú kroky pred
+                uzatvorením zmluvy.
+              </p>
+              <p>
+                Ak spolupráca nevznikne, údaje vymažeme najneskôr do 6 mesiacov,
+                pokiaľ ich nemusíme uchovať dlhšie podľa zákona. Technické
+                odoslanie formulára zabezpečuje Web3Forms.
+              </p>
+              <p>
+                Môžete požiadať o prístup, opravu alebo vymazanie svojich údajov
+                a máte právo podať sťažnosť Úradu na ochranu osobných údajov SR.
+                Do správy, prosím, neuvádzajte citlivé osobné údaje.
+              </p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function App() {
   const rootRef = useRef(null);
   const [isReducedMotion, setIsReducedMotion] = useState(false);
@@ -733,10 +960,14 @@ function App() {
       <ScrollStory story={VIDEO_STORIES[1]} isReducedMotion={isReducedMotion} />
       <DrawingsStory isReducedMotion={isReducedMotion} />
       <PricingSection />
+      <ContactSection />
 
       <footer className="site-footer">
         <img src="/brand/ilumi-logo-white.png" alt="ILUMI INTERIOR" />
-        <p>Interiérový dizajn · vizualizácie · interaktívne prehliadky</p>
+        <div className="site-footer__copy">
+          <a href="#kontakt">Kontakt</a>
+          <p>Interiérový dizajn · vizualizácie · interaktívne prehliadky</p>
+        </div>
       </footer>
     </main>
   );
