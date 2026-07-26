@@ -899,7 +899,12 @@ a {
   border: 0;
   color: var(--paper);
   cursor: pointer;
+  text-decoration: none;
   text-align: center;
+}
+
+.tour-gate--external {
+  display: none;
 }
 
 .tour-gate__mark {
@@ -1698,6 +1703,14 @@ a {
   .brand {
     min-width: 2.75rem;
     min-height: 2.75rem;
+  }
+
+  .tour-gate--embed {
+    display: none;
+  }
+
+  .tour-gate--external {
+    display: grid;
   }
 }
 

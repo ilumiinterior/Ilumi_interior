@@ -739,22 +739,44 @@ function VirtualTourSection() {
             )}
 
             {!isEngaged && (
-              <button
-                className="tour-gate"
-                type="button"
-                onClick={startTour}
-                aria-label={isLoaded ? "Pokračovať v 360-stupňovej prehliadke" : undefined}
-              >
-                <span className="tour-gate__mark" aria-hidden="true">
-                  360°
-                </span>
-                <strong>{isLoaded ? "Pokračovať v prehliadke" : "Spustiť prehliadku"}</strong>
-                <small>
-                  {isLoaded
-                    ? "Po skončení ovládania môžete pokračovať v posúvaní stránky."
-                    : "Načíta sa až po kliknutí, aby zostala stránka rýchla."}
-                </small>
-              </button>
+              <>
+                <button
+                  className="tour-gate tour-gate--embed"
+                  type="button"
+                  onClick={startTour}
+                  aria-label={
+                    isLoaded ? "Pokračovať v 360-stupňovej prehliadke" : undefined
+                  }
+                >
+                  <span className="tour-gate__mark" aria-hidden="true">
+                    360°
+                  </span>
+                  <strong>
+                    {isLoaded ? "Pokračovať v prehliadke" : "Spustiť prehliadku"}
+                  </strong>
+                  <small>
+                    {isLoaded
+                      ? "Po skončení ovládania môžete pokračovať v posúvaní stránky."
+                      : "Načíta sa až po kliknutí, aby zostala stránka rýchla."}
+                  </small>
+                </button>
+
+                <a
+                  className="tour-gate tour-gate--external"
+                  href={VIRTUAL_TOUR_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Otvoriť 360-stupňovú prehliadku na celej obrazovke"
+                >
+                  <span className="tour-gate__mark" aria-hidden="true">
+                    360°
+                  </span>
+                  <strong>Otvoriť 360° prehliadku</strong>
+                  <small>
+                    Na mobile sa otvorí samostatne, aby dotyky a gestá fungovali spoľahlivo.
+                  </small>
+                </a>
+              </>
             )}
           </div>
         </div>
