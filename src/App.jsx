@@ -121,7 +121,8 @@ const PROJECT_TYPES = [
 ];
 
 const INSTAGRAM_URL = "https://www.instagram.com/ilumi.interior/";
-const VIRTUAL_TOUR_URL = "https://prehliadka1.vercel.app/";
+const VIRTUAL_TOUR_URL =
+  "https://prehliadka1.vercel.app/?tour=tours%2Fdemo%2Ftour.json";
 
 const INSTAGRAM_POSTS = [
   {
