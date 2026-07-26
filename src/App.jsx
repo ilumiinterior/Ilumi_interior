@@ -36,6 +36,15 @@ const VIDEO_STORIES = [
   },
 ];
 
+const DRAWINGS_STORY = {
+  sources: {
+    mobile: "/media/ilumi-drawings-mobile.mp4",
+    desktop: "/media/ilumi-drawings-1080.mp4",
+  },
+  poster: "/media/poster-drawings.jpg",
+  ariaLabel: "Projektová dokumentácia interiéru ILUMI INTERIOR",
+};
+
 const SERVICES = [
   {
     title: "Interiérový dizajn",
@@ -382,6 +391,220 @@ function ScrollStory({ story, isReducedMotion }) {
   );
 }
 
+function DrawingsStory({ isReducedMotion }) {
+  const sectionRef = useRef(null);
+  const scrollRef = useRef(null);
+  const videoRef = useRef(null);
+  const progressRef = useRef(null);
+  const progressTextRef = useRef(null);
+  const hasInitializedVideoRef = useRef(false);
+  const [videoState, setVideoState] = useState("loading");
+  const [shouldPreload, setShouldPreload] = useState(false);
+  const videoSource = useMemo(
+    () => selectVideoSource(DRAWINGS_STORY.sources),
+    [],
+  );
+
+  useEffect(() => {
+    if (!sectionRef.current) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldPreload(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "100% 0px" },
+    );
+
+    observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return undefined;
+
+    const unlockVideo = () => {
+      if (video.readyState < 1) {
+        video.load();
+        return;
+      }
+
+      const currentTime = video.currentTime;
+      video
+        .play()
+        .then(() => {
+          video.pause();
+          video.currentTime = currentTime;
+          window.removeEventListener("touchstart", unlockVideo);
+        })
+        .catch(() => {});
+    };
+
+    window.addEventListener("touchstart", unlockVideo, { passive: true });
+    return () => window.removeEventListener("touchstart", unlockVideo);
+  }, []);
+
+  useLayoutEffect(() => {
+    const video = videoRef.current;
+    if (!video || videoState !== "ready") return undefined;
+
+    if (isReducedMotion) {
+      video.currentTime = Math.min(video.duration * 0.58, video.duration - 0.05);
+      return undefined;
+    }
+
+    let cleanupSeek = () => {};
+    const context = gsap.context(() => {
+      const duration = Math.max(0, video.duration - 0.05);
+      const frameThreshold = 1 / 60;
+      let targetTime = 0;
+      let seekInProgress = false;
+      let seekFrame = 0;
+
+      const applyLatestFrame = () => {
+        seekFrame = 0;
+        if (seekInProgress || Math.abs(video.currentTime - targetTime) < frameThreshold) {
+          return;
+        }
+
+        seekInProgress = true;
+        video.currentTime = targetTime;
+      };
+
+      const requestLatestFrame = () => {
+        if (!seekFrame) {
+          seekFrame = window.requestAnimationFrame(applyLatestFrame);
+        }
+      };
+
+      const handleSeeked = () => {
+        seekInProgress = false;
+        if (Math.abs(video.currentTime - targetTime) >= frameThreshold) {
+          requestLatestFrame();
+        }
+      };
+
+      video.addEventListener("seeked", handleSeeked);
+
+      ScrollTrigger.create({
+        trigger: scrollRef.current,
+        start: "top top",
+        end: "bottom bottom",
+        invalidateOnRefresh: true,
+        onUpdate: ({ progress }) => {
+          targetTime = progress * duration;
+          requestLatestFrame();
+
+          const percent = Math.round(progress * 100);
+          progressRef.current?.style.setProperty("--progress", progress);
+          if (progressTextRef.current) {
+            progressTextRef.current.textContent = String(percent).padStart(2, "0");
+          }
+        },
+      });
+
+      cleanupSeek = () => {
+        video.removeEventListener("seeked", handleSeeked);
+        window.cancelAnimationFrame(seekFrame);
+      };
+    }, scrollRef);
+
+    ScrollTrigger.refresh();
+    return () => {
+      cleanupSeek();
+      context.revert();
+    };
+  }, [videoState, isReducedMotion]);
+
+  const handleMetadata = () => {
+    const video = videoRef.current;
+    if (
+      !video ||
+      hasInitializedVideoRef.current ||
+      !Number.isFinite(video.duration) ||
+      video.duration <= 0
+    ) {
+      return;
+    }
+
+    hasInitializedVideoRef.current = true;
+    video.pause();
+    video.currentTime = 0;
+    setVideoState("ready");
+  };
+
+  return (
+    <section
+      id="vykresy"
+      ref={sectionRef}
+      className="drawings"
+      aria-label="Projektová dokumentácia"
+    >
+      <header className="drawings__mobile-copy">
+        <p className="section-kicker">Projektová dokumentácia / 03</p>
+        <h2>Každý detail presne zakreslený a vysvetlený.</h2>
+      </header>
+
+      <div ref={scrollRef} className="drawings__scroll">
+        <div className="drawings__scene">
+          <div className="drawings__video-pane">
+            <video
+              ref={videoRef}
+              className="drawings__video"
+              src={videoSource}
+              poster={DRAWINGS_STORY.poster}
+              preload={shouldPreload ? "auto" : "metadata"}
+              muted
+              playsInline
+              disablePictureInPicture
+              onLoadedMetadata={handleMetadata}
+              onLoadedData={handleMetadata}
+              onError={() => setVideoState("error")}
+              aria-label={DRAWINGS_STORY.ariaLabel}
+            />
+
+            <div ref={progressRef} className="progress drawings__progress" aria-hidden="true">
+              <span ref={progressTextRef}>00</span>
+              <div className="progress__track">
+                <i />
+              </div>
+              <span>100</span>
+            </div>
+
+            {videoState === "loading" && (
+              <div className="status" role="status">
+                <span className="status__line" />
+                <span>Pripravujem výkresy</span>
+              </div>
+            )}
+
+            {videoState === "error" && (
+              <div className="status status--error" role="alert">
+                <strong>Video sa nepodarilo načítať.</strong>
+                <span>Skontrolujte pripojenie a obnovte stránku.</span>
+              </div>
+            )}
+          </div>
+
+          <div className="drawings__desktop-copy">
+            <p className="section-kicker">Projektová dokumentácia / 03</p>
+            <h2>Každý detail presne zakreslený a vysvetlený.</h2>
+            <div className="scroll-cue" aria-hidden="true">
+              <span>Posúvajte</span>
+              <svg viewBox="0 0 16 22">
+                <path d="M8 1v18m0 0 6-6m-6 6-6-6" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ServicesSection() {
   return (
     <section className="content-section services" aria-labelledby="services-title">
@@ -508,6 +731,7 @@ function App() {
       <ScrollStory story={VIDEO_STORIES[0]} isReducedMotion={isReducedMotion} />
       <ServicesSection />
       <ScrollStory story={VIDEO_STORIES[1]} isReducedMotion={isReducedMotion} />
+      <DrawingsStory isReducedMotion={isReducedMotion} />
       <PricingSection />
 
       <footer className="site-footer">

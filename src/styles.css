@@ -348,6 +348,80 @@ a {
   border-bottom: 1px solid oklch(26% 0.01 82);
 }
 
+.drawings {
+  position: relative;
+  overflow: clip;
+  background: oklch(10.5% 0.007 82);
+  border-top: 1px solid oklch(26% 0.01 82);
+  border-bottom: 1px solid oklch(26% 0.01 82);
+}
+
+.drawings__mobile-copy {
+  display: grid;
+  gap: var(--space-lg);
+  min-height: 45svh;
+  align-content: end;
+  padding:
+    clamp(5rem, 17vw, 8rem)
+    max(var(--page-gutter), env(safe-area-inset-right))
+    clamp(3.5rem, 12vw, 5.5rem)
+    max(var(--page-gutter), env(safe-area-inset-left));
+}
+
+.drawings h2 {
+  max-width: 13ch;
+  margin: 0 0 0 -0.04em;
+  color: var(--paper);
+  font-family: "Geologica", sans-serif;
+  font-size: clamp(2.5rem, 11vw, 4.2rem);
+  font-variation-settings: "wdth" 78;
+  font-weight: 650;
+  letter-spacing: -0.06em;
+  line-height: 0.95;
+  text-wrap: balance;
+}
+
+.drawings__scroll {
+  height: 300svh;
+  min-height: 112rem;
+}
+
+.drawings__scene {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100svh;
+  min-height: 32rem;
+  overflow: hidden;
+  background: oklch(8% 0.006 82);
+}
+
+.drawings__video-pane {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: oklch(6.5% 0.005 82);
+}
+
+.drawings__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: oklch(6.5% 0.005 82);
+}
+
+.drawings__desktop-copy {
+  display: none;
+}
+
+.drawings__progress {
+  left: max(var(--page-gutter), env(safe-area-inset-left));
+  right: max(var(--page-gutter), env(safe-area-inset-right));
+  grid-template-columns: auto minmax(4.5rem, 1fr) auto;
+}
+
 .section-shell {
   width: min(100%, 92rem);
   margin-inline: auto;
@@ -675,7 +749,16 @@ a {
   min-height: 32rem;
 }
 
+.reduced-motion .drawings__scroll {
+  height: 100svh;
+  min-height: 32rem;
+}
+
 .reduced-motion .scene {
+  position: relative;
+}
+
+.reduced-motion .drawings__scene {
   position: relative;
 }
 
@@ -688,7 +771,8 @@ a {
   transform: none !important;
 }
 
-.reduced-motion .progress {
+.reduced-motion .progress,
+.reduced-motion .drawings__progress {
   display: none;
 }
 
@@ -745,6 +829,64 @@ a {
     bottom: clamp(4.5rem, 9vh, 7rem);
   }
 
+  .drawings__mobile-copy {
+    display: none;
+  }
+
+  .drawings__scroll {
+    height: 350svh;
+    min-height: 140rem;
+  }
+
+  .drawings__scene {
+    display: grid;
+    grid-template-columns: minmax(22rem, 44%) minmax(0, 56%);
+  }
+
+  .drawings__video-pane {
+    display: grid;
+    place-items: center;
+    padding:
+      clamp(1.5rem, 3.5vw, 3.75rem)
+      clamp(1rem, 2.5vw, 2.5rem);
+  }
+
+  .drawings__video {
+    width: auto;
+    max-width: 100%;
+    height: min(86svh, 58vw);
+    max-height: 100%;
+  }
+
+  .drawings__desktop-copy {
+    display: grid;
+    align-content: center;
+    gap: var(--space-xl);
+    padding:
+      max(clamp(3rem, 7vw, 8rem), env(safe-area-inset-top))
+      max(clamp(3rem, 7vw, 8rem), env(safe-area-inset-right))
+      max(clamp(3rem, 7vw, 8rem), env(safe-area-inset-bottom))
+      clamp(3rem, 7vw, 8rem);
+    border-left: 1px solid oklch(24% 0.009 82);
+    background:
+      radial-gradient(circle at 30% 45%, oklch(18% 0.012 82 / 0.42), transparent 48%),
+      oklch(10.5% 0.007 82);
+  }
+
+  .drawings__desktop-copy h2 {
+    max-width: 11ch;
+    font-size: clamp(3rem, 5.5vw, 6.3rem);
+  }
+
+  .drawings__desktop-copy .scroll-cue {
+    padding-top: var(--space-lg);
+  }
+
+  .drawings__progress {
+    left: clamp(1rem, 2.5vw, 2.5rem);
+    right: clamp(1rem, 2.5vw, 2.5rem);
+  }
+
   .service-grid,
   .pricing-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -788,6 +930,10 @@ a {
 @media (pointer: coarse) {
   .story {
     height: 400svh;
+  }
+
+  .drawings__scroll {
+    height: 300svh;
   }
 
   .brand {
